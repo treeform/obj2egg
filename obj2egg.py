@@ -10,20 +10,55 @@
         -s show in pview
        
     licensed under WTFPL (http://sam.zoy.org/wtfpl/) 
-"""
+""" 
+
 from pandac.PandaModules import *
 import math
 
+def _float(i):
+    try:
+        return float(i)
+    except:
+        return 0
+
 def floats(flaot_list):
-    return [ float(number) for number in flaot_list]
+    return [ _float(number) for number in flaot_list]
+
+def _int(i):
+    try:
+        return int(i)
+    except:
+        return 0
 
 def ints(int_list):
-    return [ int(number) for number in int_list]
+    return [ _int(number) for number in int_list]
 
+def read_mtl(filename):
+    textures = {}
+    name = "default"
+   
+    file = open(filename)
+    for line in file.readlines():
+        if not line or "#" == line[0]:
+            continue
+        tokens = line.split()
+        if tokens:
+            if tokens[0] == "newmtl":
+                name = tokens[1]
+            elif tokens[0] == "map_Kd":
+                textures[name] = tokens[1]
+            else:
+                print tokens
+               
+    print  textures
+    return textures
+                 
 def read_obj(filename):
     file = open(filename)
     egg = EggData()
     meshName = ""
+    textures = {}
+    texture = None
     points = []
     uvs    = []
     normals= []
@@ -50,10 +85,14 @@ def read_obj(filename):
                 if meshName != "":
                     egn = EggGroup(meshName)
                     egg.addChild(egn)
+                    if texture and texture in textures:
+                        et = EggTexture(texture,textures[texture])
+                   
                     evp = EggVertexPool(meshName)
                     egn.addChild(evp)
-                    for face in faces:                   
-                        ep = EggPolygon()
+                    for face in faces:
+                        ep = EggPolygon()   
+                        if et: ep.addTexture(et)               
                         for vertex in face:
                             if len(vertex) == 3:
                                 iPoint, iUv, iNormal = vertex
@@ -69,6 +108,13 @@ def read_obj(filename):
                         egn.addChild(ep)
                 if len(tokens) > 1 :
                     meshName = tokens[1] 
+            elif tokens[0] == "mtllib":
+                textures.update(read_mtl(tokens[1]))
+            elif tokens[0] == "usemtl":
+                texture = tokens[1]
+            else:
+                print tokens[0],"unkown"
+   
     return egg
 
 
@@ -89,22 +135,19 @@ if __name__ == "__main__":
         elif o in ("-s", "--show"):
                 show = True
     for infile in args:
-        try:
-            if ".obj" not in infile:
-                print "WARNING",infile,"does not look like a valid obj file"
-                continue
-            egg = read_obj(infile)
-            f, e = os.path.splitext(infile)
-            outfile = f+".egg"
-            for o, a in opts:
-                if o in ("-n", "--normals"):
-                    egg.recomputeVertexNormals(float(a))
-                elif o in ("-b", "--binormals"):
-                    egg.recomputeTangentBinormal(GlobPattern(""))
-            egg.removeUnusedVertices(GlobPattern(""))
-            egg.triangulatePolygons(EggData.TConvex & EggData.TPolygon)
-            egg.writeEgg(Filename(outfile))
-            if show:
-                os.system("pview "+outfile)
-        except Exception,e:
-            print e 
+        if ".obj" not in infile:
+            print "WARNING",infile,"does not look like a valid obj file"
+            continue
+        egg = read_obj(infile)
+        f, e = os.path.splitext(infile)
+        outfile = f+".egg"
+        for o, a in opts:
+            if o in ("-n", "--normals"):
+                egg.recomputeVertexNormals(float(a))
+            elif o in ("-b", "--binormals"):
+                egg.recomputeTangentBinormal(GlobPattern(""))
+        egg.removeUnusedVertices(GlobPattern(""))
+        egg.triangulatePolygons(EggData.TConvex & EggData.TPolygon)
+        egg.writeEgg(Filename(outfile))
+        if show:
+            os.system("pview "+outfile) 
