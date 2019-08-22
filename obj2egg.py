@@ -17,7 +17,9 @@
     licensed under WTFPL (http://sam.zoy.org/wtfpl/)
 """
 
-from pandac.PandaModules import *
+from panda3d.core import *
+from panda3d.egg import *
+
 import math
 import string
 import getopt
