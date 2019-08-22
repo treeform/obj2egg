@@ -55,16 +55,16 @@ class ObjMaterial:
         return self
 
     def get(self, key):
-        if self.attrib.has_key(key):
+        if key in self.attrib:
             return self.attrib[key]
         return None
 
     def has_key(self, key):
-        return self.attrib.has_key(key)
+        return key in self.attrib
 
     def isTextured(self):
         # for k in ("map_Kd", "map_Bump", "map_Ks"):    <-- NOT YET
-        if self.attrib.has_key("map_Kd"):
+        if "map_Kd" in self.attrib:
             return True;
         return False;
 
@@ -377,7 +377,7 @@ class ObjFile:
 
     def __usematerial(self, material):
         if False: print("__usematerial:", "material:", material)
-        if self.materialsbyname.has_key(material):
+        if material in self.materialsbyname:
             self.currentmaterial = material
         else:
             print("warning:", "__usematerial:", "unknown material:", material)
@@ -418,7 +418,7 @@ class ObjFile:
         return self
 
     def __eggifymats(self, eprim, wmat):
-        if self.materialsbyname.has_key(wmat):
+        if wmat in self.materialsbyname:
             mtl = self.materialsbyname[wmat]
             if mtl.isTextured():
                 eprim.setTexture(mtl.getEggTexture())
