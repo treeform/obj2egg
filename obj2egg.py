@@ -85,15 +85,11 @@ class ObjMaterial:
         m = EggMaterial(self.name + "_mat")
         # XXX TODO: add support for specular, and obey illum setting
         # XXX as best as we can
-        rgb = self.get("Kd")
-        if rgb is not None:
-            m.setDiff(Vec4(rgb[0], rgb[1], rgb[2], 1.0))
-        rgb = self.get("Ka")
-        if rgb is not None:
-            m.setAmb(Vec4(rgb[0], rgb[1], rgb[2], 1.0))
-        rgb = self.get("Ks")
-        if rgb is not None:
-            m.setSpec(Vec4(rgb[0], rgb[1], rgb[2], 1.0))
+        
+        for key in ["Kd", "Ka", "Ks"]:
+            with self.get(key) as rgb:
+                if rgb is not None: {"Kd":m.setDiff, "Ka":m.setAmb, "Ks":m.setSpec}[key](Vec4(rgb[0], rgb[1], rgb[2], 1.0))
+        
         ns = self.get("Ns")
         if ns is not None:
             m.setShininess(ns)
