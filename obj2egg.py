@@ -234,22 +234,11 @@ class ObjFile:
 		res = []
 		for vert in lst:
 			vinfo = vert.split("/")
-			vlen = len(vinfo)
+			
 			vertex = {'v':None, 'vt':None, 'vn':None}
-			if vlen == 1:
-				vertex['v'] = int(vinfo[0])
-			elif vlen == 2:
-				if vinfo[0] != '':
-					vertex['v'] = int(vinfo[0])
-				if vinfo[1] != '':
-					vertex['vt'] = int(vinfo[1])
-			elif vlen == 3:
-				if vinfo[0] != '':
-					vertex['v'] = int(vinfo[0])
-				if vinfo[1] != '':
-					vertex['vt'] = int(vinfo[1])
-				if vinfo[2] != '':
-					vertex['vn'] = int(vinfo[2])
+			if len(vinfo) in [1,2,3]:
+				for i in range(min(len(vinfo),3)):
+					vertex[['v','vt','vn'][i]] = int(vinfo[i]) if not vinfo[i] == '' else None
 			else:
 				print("aborting...")
 				raise(UNKNOWN, res)
@@ -261,6 +250,7 @@ class ObjFile:
 		mtllib = MtlFile(mtl)
 		self.matlibs.append(mtllib)
 		self.indexmaterials(mtllib)
+		return self
 	
 	def __enclose(self, lst):
 		mdata = (self.currentobject, self.currentgroup, self.currentmaterial)
