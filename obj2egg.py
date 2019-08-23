@@ -57,24 +57,19 @@ class ObjMaterial:
         return self
 
     def get(self, key):
-        if key in self.attrib:
-            return self.attrib[key]
-        return None
+        return self.attrib[key] if key in self.attrib else None
 
     def has_key(self, key):
         return key in self.attrib
 
     def isTextured(self):
-        # for k in ("map_Kd", "map_Bump", "map_Ks"):    <-- NOT YET
-        if "map_Kd" in self.attrib:
-            return True;
-        return False;
+        return "map_Kd" in self.attrib
 
     def getEggTexture(self):
         if self.eggdiffusetexture:
             return self.eggdiffusetexture
         if not self.isTextured():
-            return none
+            return None
         m = EggTexture(self.name + "_diffuse", self.get("map_Kd"))
         m.setFormat(EggTexture.FRgb)
         m.setMagfilter(EggTexture.FTLinearMipmapLinear)
