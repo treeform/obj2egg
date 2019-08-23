@@ -508,7 +508,7 @@ def main(argv=None):
         argv = sys.argv
     try:
         opts, args = getopt.getopt(argv[1:], "hn:bs", ["help", "normals", "binormals", "show"])
-    except(getopt.error, msg):
+    except getopt.error as msg:
         print(msg)
         print(__doc__)
         return 2
@@ -541,7 +541,7 @@ def main(argv=None):
             egg.writeEgg(Filename(outfile))
             if show:
                 os.system("pview " + outfile)
-        except(Exception,e):
+        except Exception as e:
             print(e)
     return 0
 
