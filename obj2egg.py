@@ -93,6 +93,7 @@ class ObjMaterial:
 		ns = self.get("Ns")
 		if ns is not None:
 			m.setShininess(ns)
+		
 		self.eggmaterial = m
 		return self.eggmaterial
 
@@ -252,13 +253,12 @@ class ObjFile:
 			else:
 				print("aborting...")
 				raise(UNKNOWN, res)
+			
 			res.append(vertex)
-		if False: print(res)
 		return res
 	
 	def __mtllib(self, mtl):
 		mtllib = MtlFile(mtl)
-		# if verbose: print mtllib
 		self.matlibs.append(mtllib)
 		self.indexmaterials(mtllib)
 	
@@ -268,13 +268,11 @@ class ObjFile:
 
 	def __newpolyline(self, l):
 		polyline = self.__vertlist(l)
-		if False: print("__newline:", polyline)
 		self.polylines.append(self.__enclose(polyline))
 		return self
 
 	def __newface(self, f):
 		face = self.__vertlist(f)
-		if False: print(face)
 		self.faces.append(self.__enclose(face))
 		return self
 
@@ -310,7 +308,6 @@ class ObjFile:
 
 	def __newobject(self, object):
 		self.__closeobject()
-		if False: print("__newobject:", "object:", object)
 		self.currentobject = object
 		self.objects.append(object)
 		return self
@@ -321,13 +318,11 @@ class ObjFile:
 
 	def __newgroup(self, group):
 		self.__closegroup()
-		if False: print("__newgroup:", "group:", group)
 		self.currentgroup = group
 		self.groups.append(group)
 		return self
 
 	def __usematerial(self, material):
-		if False: print("__usematerial:", "material:", material)
 		if material in self.materialsbyname:
 			self.currentmaterial = material
 		else:
@@ -383,8 +378,6 @@ class ObjFile:
 				eprim.setColor(Vec4(rgb[0], rgb[1], rgb[2], 1.0))
 			# [continued...] but you may *not* always want to assign
 			# materials to untextured polys...  hmmmm.
-			if False:
-				eprim.setMaterial(mtl.getEggMaterial())
 		return self
 
 	def __facestoegg(self, egg, objname, groupname):
